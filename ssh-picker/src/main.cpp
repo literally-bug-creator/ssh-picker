@@ -3,27 +3,53 @@
 #include <string>
 #include <vector>
 
-#include "ftxui/component/captured_mouse.hpp"      // for ftxui
-#include "ftxui/component/component.hpp"           // for Menu
-#include "ftxui/component/component_options.hpp"   // for MenuOption
-#include "ftxui/component/screen_interactive.hpp"  // for ScreenInteractive
+#include "ftxui/component/component.hpp"
+#include "ftxui/component/component_base.hpp"
+#include "ftxui/component/screen_interactive.hpp"
+#include "tui.hpp"
+
+using namespace ftxui;
 
 int main() {
-  using namespace ftxui;
-  auto screen = ScreenInteractive::TerminalOutput();
+    std::vector<std::string> menuEntries = {"server", "aboba", "serva4ok",
+                                            "hhh"};
 
-  std::vector<std::string> entries = {
-      "entry 1",
-      "entry 2",
-      "entry 3",
-  };
-  int selected = 0;
+    TUI tui = TUI();
+    Component menu = tui.buildMenu(menuEntries);
+    Component infoDisplay = tui.buildInfoDisplay(menuEntries);
 
-  MenuOption option;
-  option.on_enter = screen.ExitLoopClosure();
-  auto menu = Menu(&entries, &selected, option);
+    Component container = Container::Horizontal({
+        menu,
+        infoDisplay,
+    });
 
-  screen.Loop(menu);
+    auto screen = ScreenInteractive::TerminalOutput();
 
-  std::cout << "Selected element = " << selected << std::endl;
+    auto renderer = Renderer(container, [&] {
+        if (tui.isShouldExit()) {
+            screen.ExitLoopClosure()();
+        }
+        return vbox({
+                   hbox({
+                       vbox({
+                           hcenter(bold(text("Available Hosts"))),
+                           separator(),
+                           menu->Render(),
+                       }),
+                       separator(),
+                       vbox({
+                           hcenter(bold(text("Info"))),
+                           separator(),
+                           infoDisplay->Render(),
+                       }) | flex,
+                   }),
+               }) |
+               border;
+    });
+
+    screen.Loop(renderer);
+
+    if (tui.isShouldExit()) {
+        std::cout << "Exit" << "\n";
+    }
 }
