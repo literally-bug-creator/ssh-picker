@@ -23,13 +23,15 @@ format-check:
 	@find . -name "*.cpp" -o -name "*.hpp" -o -name "*.h" -o -name "*.cc" | \
 	grep -E "($(PROJECT_NAME))" | \
 	grep -v "third-party" | \
-	xargs clang-format --dry-run --Werror --style=file
+	grep -v "build" | \
+	xargs clang-format --dry-run --Werror --style=file:.clang-format
 
 format:
 	@find . -name "*.cpp" -o -name "*.hpp" -o -name "*.h" -o -name "*.cc" | \
 	grep -E "($(PROJECT_NAME)|tests)" | \
 	grep -v "third-party" | \
-	xargs clang-format -i --style=file
+	grep -v "build" | \
+	xargs clang-format -i --style=file:.clang-format
 
 static-analysis: debug
 	@find $(PROJECT_NAME) -name "*.cpp" -o -name "*.hpp" -o -name "*.h" | \
