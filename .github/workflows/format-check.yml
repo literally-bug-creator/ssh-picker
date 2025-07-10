@@ -18,8 +18,7 @@ jobs:
       - name: Setup build environment
         run: |
           sudo apt update
-          sudo apt install -y clang-format-20
-          sudo ln -sf /usr/bin/clang-format-20 /usr/local/bin/clang-format
+          sudo apt-get -y install clang-format
           which clang-format || echo "clang-format not found"
           clang-format --version
 
