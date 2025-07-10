@@ -10,6 +10,8 @@ jobs:
   format-check:
     name: Format Check
     runs-on: ubuntu-latest
+    container:
+      image: silkeh/clang:20
 
     steps:
       - name: Checkout code
